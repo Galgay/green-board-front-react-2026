@@ -1,17 +1,18 @@
 import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import BoardFooter from "./components/BoardFooter";
 import BoardHeader from "./components/BoardHeader";
 import PostList from "./components/PostList";
-import "./style.css";
 import PostForm from "./components/PostForm";
+import PostDetail from "./components/PostDetail";
+import Login from "./components/Login";
+import "./style.css";
 
 export default function App() {
   const [posts, setPosts] = useState([
     {id: 1, title: "첫 번째 게시글", authorNickname: "학생", createdDatetime: "2026-10-04", content: "우끼끼"},
     {id: 2, title: "두 번째 게시글", authorNickname: "강사", createdDatetime: "2026-10-04", content: "바나나"},
   ]);
-
-  const [page, setPage] = useState("list");
 
   function addPracticePost(){
     const id = Date.now();
@@ -31,33 +32,18 @@ export default function App() {
       {id:Date.now(), ...post, authorNickname: "학생", createdDatetime: "2026-10-04"},
       ...currentPosts,
     ]);
-
-    setPage("list");
   }
 
   return (
     <>
-      <BoardHeader onWrite={() => setPage("write")}/>
-      
-      {page === "list" && <main>
-        <h1>게시판</h1>
-        <p id="list-message" role="status">게시글 목록</p>
-        <button id="retry-list" type="button">목록 다시 시도</button>
-
-        <PostList posts={posts} onSelect={(post) => window.alert(post.title)}/>
-        <button type="button" onClick={addPracticePost}>임시 게시글 추가</button>
-
-        <div className="pagination" aria-label="페이지 이동">
-          <button id="previous-page" type="button" disabled>이전</button>
-          <span id="page-number">1 페이지</span>
-          <button id="next-page" type="button" disabled>다음</button>
-        </div>
-      </main> }
-      {page === "write" && <main>
-        <h1>글쓰기</h1>
-        <PostForm onSave={savePost} onCancel={() => setPage("list")} />
-      </main>}
-
+      <BoardHeader />
+      <Routes>
+        <Route path="/" element={<PostList posts={posts} onAddPracticePost={addPracticePost} />} />
+        <Route path="/posts" element={<PostList posts={posts} onAddPracticePost={addPracticePost} />} />
+        <Route path="/posts/new" element={<PostForm onSave={savePost} />} />
+        <Route path="/posts/:postId" element={<PostDetail />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
       <BoardFooter />
     </>
   )
